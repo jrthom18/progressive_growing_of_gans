@@ -72,7 +72,13 @@ class TFRecordExporter:
             for lod in range(self.resolution_log2 - 1):
                 tfr_file = self.tfr_prefix + '-r%02d.tfrecords' % (self.resolution_log2 - lod)
                 self.tfr_writers.append(tf.python_io.TFRecordWriter(tfr_file, tfr_opt))
+
+        # Handle shape mismatches for xray images
+        if not img.shape == self.shape:
+            img = img[:, :, :, 0]
+
         assert img.shape == self.shape
+
         for lod, tfr_writer in enumerate(self.tfr_writers):
             if lod:
                 img = img.astype(np.float32)
@@ -609,7 +615,7 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
     if resolution != 2 ** int(np.floor(np.log2(resolution))):
         error('Input image resolution must be a power-of-two')
     if channels not in [1, 3]:
-        error('Input images must be stored as RGB or grayscale')
+        error('Input images must be stored as RGB or grayscale') 
     
     with TFRecordExporter(tfrecord_dir, len(image_filenames)) as tfr:
         order = tfr.choose_shuffled_order() if shuffle else np.arange(len(image_filenames))
