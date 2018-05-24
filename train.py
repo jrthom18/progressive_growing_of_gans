@@ -21,7 +21,7 @@ import misc
 
 def setup_snapshot_image_grid(G, training_set,
     size    = '1080p',      # '1080p' = to be viewed on 1080p display, '4k' = to be viewed on 4k display.
-    layout  = 'random'):    # 'random' = grid contents are selected randomly, 'row_per_class' = each row corresponds to one class label.
+    layout  = 'row_per_class'):    # 'random' = grid contents are selected randomly, 'row_per_class' = each row corresponds to one class label.
 
     # Select size.
     gw = 1; gh = 1

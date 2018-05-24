@@ -627,6 +627,11 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
                 img = img.transpose(2, 0, 1) # HWC => CHW
             tfr.add_image(img)
 
+        # TODO: Feed in any labels for the associated images
+        npy_filename = image_dir + 'labels.npy'
+        if os.path.isfile(npy_filename):
+            tfr.add_labels(np.load(npy_filename)[order])
+
 #----------------------------------------------------------------------------
 
 def create_from_hdf5(tfrecord_dir, hdf5_filename, shuffle):
