@@ -628,7 +628,7 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
             tfr.add_image(img)
 
         # TODO: Feed in any labels for the associated images
-        npy_filename = image_dir + 'labels.npy'
+        npy_filename = 'labels.npy'
         if os.path.isfile(npy_filename):
             tfr.add_labels(np.load(npy_filename)[order])
 
