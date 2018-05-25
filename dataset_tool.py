@@ -93,6 +93,7 @@ class TFRecordExporter:
     def add_labels(self, labels):
         if self.print_progress:
             print('%-40s\r' % 'Saving labels...', end='', flush=True)
+
         assert labels.shape[0] == self.cur_images
         with open(self.tfr_prefix + '-rxx.labels', 'wb') as f:
             np.save(f, labels.astype(np.float32))
@@ -627,10 +628,11 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
                 img = img.transpose(2, 0, 1) # HWC => CHW
             tfr.add_image(img)
 
-        # TODO: Feed in any labels for the associated images
+        # Feed in any labels for the associated images
         npy_filename = 'labels.npy'
+        label_file = np.load(npy_filename)
         if os.path.isfile(npy_filename):
-            tfr.add_labels(np.load(npy_filename)[order])
+            tfr.add_labels(label_file[order])
 
 #----------------------------------------------------------------------------
 

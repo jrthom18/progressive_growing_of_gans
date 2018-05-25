@@ -25,9 +25,10 @@ def setup_snapshot_image_grid(G, training_set,
 
     # Select size.
     gw = 1; gh = 1
+
     if size == '1080p':
-        gw = np.clip(1920 // G.output_shape[3], 3, 32)
-        gh = np.clip(1080 // G.output_shape[2], 2, 32)
+        gw = np.clip(1920 // G.output_shape[3], 10, 32)
+        gh = np.clip(1080 // G.output_shape[2], 14, 32)
     if size == '4k':
         gw = np.clip(3840 // G.output_shape[3], 7, 32)
         gh = np.clip(2160 // G.output_shape[2], 4, 32)

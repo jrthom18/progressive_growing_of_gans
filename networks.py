@@ -172,6 +172,8 @@ def G_paper(
     
     latents_in.set_shape([None, latent_size])
     labels_in.set_shape([None, label_size])
+
+    # TODO: Experiment with a multiplication of latents_in and labels_in here?
     combo_in = tf.cast(tf.concat([latents_in, labels_in], axis=1), dtype)
     lod_in = tf.cast(tf.get_variable('lod', initializer=np.float32(0.0), trainable=False), dtype)
 
