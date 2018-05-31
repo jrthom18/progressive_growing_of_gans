@@ -33,8 +33,12 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     if D.output_shapes[1][1] > 0:
         with tf.name_scope('LabelPenalty'):
-            label_penalty_fakes = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=fake_labels_out)
-        loss += label_penalty_fakes * cond_weight
+            #label_penalty_fakes = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=fake_labels_out)
+            # Use sigmoid_cross_entropy_with_logits for multilabel classification
+            label_penalty_fakes = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=fake_labels_out)
+        #loss += label_penalty_fakes * cond_weight
+        # Compute the mean of the componentwise logistic losses for label_penalty_fakes
+        loss += tf.reduce_mean(label_penalty_fakes, 1) * cond_weight
     return loss
 
 #----------------------------------------------------------------------------
@@ -72,11 +76,17 @@ def D_wgangp_acgan(G, D, opt, training_set, minibatch_size, reals, labels,
 
     if D.output_shapes[1][1] > 0:
         with tf.name_scope('LabelPenalty'):
-            label_penalty_reals = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=real_labels_out)
-            label_penalty_fakes = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=fake_labels_out)
+            #label_penalty_reals = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=real_labels_out)
+            #label_penalty_fakes = tf.nn.softmax_cross_entropy_with_logits_v2(labels=labels, logits=fake_labels_out)
+            # Use sigmoid_cross_entropy_with_logits for multilabel classification
+            label_penalty_reals = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=real_labels_out)
+            label_penalty_fakes = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=fake_labels_out)
             label_penalty_reals = tfutil.autosummary('Loss/label_penalty_reals', label_penalty_reals)
             label_penalty_fakes = tfutil.autosummary('Loss/label_penalty_fakes', label_penalty_fakes)
-        loss += (label_penalty_reals + label_penalty_fakes) * cond_weight
+
+        #loss += (label_penalty_reals + label_penalty_fakes) * cond_weight
+        # Compute the mean of the componentwise logistic losses for label_penalty_reals and label_penalty_fakes
+        loss += (tf.reduce_mean(label_penalty_reals, 1) + tf.reduce_mean(label_penalty_fakes, 1)) * cond_weight
     return loss
 
 #----------------------------------------------------------------------------
