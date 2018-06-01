@@ -20,15 +20,15 @@ import misc
 # periodically during training.
 
 def setup_snapshot_image_grid(G, training_set,
-    size    = '1080p',      # '1080p' = to be viewed on 1080p display, '4k' = to be viewed on 4k display.
-    layout  = 'row_per_class'):    # 'random' = grid contents are selected randomly, 'row_per_class' = each row corresponds to one class label.
+    size    = '1080p',              # '1080p' = to be viewed on 1080p display, '4k' = to be viewed on 4k display.
+    layout  = 'row_per_class'):     # 'random' = grid contents are selected randomly, 'row_per_class' = each row corresponds to one class label.
 
     # Select size.
     gw = 1; gh = 1
 
     if size == '1080p':
-        gw = np.clip(1920 // G.output_shape[3], 10, 32)
-        gh = np.clip(1080 // G.output_shape[2], 15, 32)
+        gw = np.clip(1920 // G.output_shape[3], 5, 32)
+        gh = np.clip(1080 // G.output_shape[2], 2, 32)
     if size == '4k':
         gw = np.clip(3840 // G.output_shape[3], 7, 32)
         gh = np.clip(2160 // G.output_shape[2], 4, 32)
@@ -49,7 +49,22 @@ def setup_snapshot_image_grid(G, training_set,
 
     # Generate latents.
     latents = misc.random_latents(gw * gh, G)
-    return (gw, gh), reals, labels, latents
+    
+    # Generate labels for specific conditions
+    custom_labels = generate_labels(gw, gh, training_set.label_size, training_set.dtype, [0, 1])  # Atelectasis and Cardiomegaly
+    return (gw, gh), reals, custom_labels, latents
+
+#----------------------------------------------------------------------------
+# Generate custom labels for sampling during training
+
+def generate_labels(gw, gh, label_size, dtype, label_indices):
+    labels = np.zeros([gw * gh, label_size], dtype=dtype)
+
+    for i in range(labels.shape[0] - 1):
+        for j in label_indices:
+            labels[i][j] = 1.0
+
+    return labels
 
 #----------------------------------------------------------------------------
 # Just-in-time processing of training images before feeding them to the networks.
